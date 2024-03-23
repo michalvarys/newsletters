@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3     
+    - uses: hoverkraft-tech/compose-action@v1.5.1   
+      name: Install  
+      with:
+        compose-file: "./docker-compose.yml"
+        services: |
+          db
+          app
+      env:
+        POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD || 'listmonk' }}
+        POSTGRES_USER: ${{ env.POSTGRES_USER || 'listmonk' }}
+        POSTGRES_DB: ${{ env.POSTGRES_DB || 'listmonk' }}
+        LISTMONK_app__address: 0.0.0.0:9000
+        LISTMONK_app__admin_username: ${{ env.LISTMONK_USER || 'listmonk' }}
+        LISTMONK_app__admin_password: ${{ env.LISTMONK_PASSWORD || 'listmonk' }}
+        LISTMONK_db__port: 5432
+        LISTMONK_db__host: db
+        LISTMONK_db__user: ${{ env.POSTGRES_USER || 'listmonk' }}
+        LISTMONK_db__password: ${{ env.POSTGRES_PASSWORD || 'listmonk' }}
+        LISTMONK_db__database: ${{ env.POSTGRES_DB || 'listmonk' }}
+        LISTMONK_db__ssl_mode: disable
